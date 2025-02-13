@@ -21,6 +21,7 @@ type appOptions struct {
 
 type ApplicationOption func(o *appOptions)
 
+// WithOptions appends `options` ([fx.Option]) slice into an application base [fx.Option] slice.
 func WithOptions(options ...fx.Option) ApplicationOption {
 	return func(o *appOptions) {
 		if o.fxOptions == nil {
@@ -30,13 +31,20 @@ func WithOptions(options ...fx.Option) ApplicationOption {
 	}
 }
 
-func WithPostgres() ApplicationOption {
+// WithPostgres appends [fx.Option] required to use a Postgres database in the application.
+//
+// Database client is configured with postgres.DBConfig, which is populated using environment variables;
+// Given environment variables are specified in the same config structure by the field tag `env` whereas
+// default values (if any) are specified by the field tag `envDefault`.
+func WithPostgres(enableLogging bool) ApplicationOption {
 	return func(o *appOptions) {
 		opts := []fx.Option{
 			postgresfx.Module,
 			sqlfx.GoquModule,
 			sqlfx.InterceptorModule,
-			sqlfx.ObservabilityModule,
+		}
+		if enableLogging {
+			opts = append(opts, sqlfx.ObservabilityModule)
 		}
 		if o.fxOptions == nil {
 			o.fxOptions = make([]fx.Option, 0, len(opts))
@@ -45,6 +53,14 @@ func WithPostgres() ApplicationOption {
 	}
 }
 
+// WithServerHTTP appends [fx.Option] required to spin up an HTTP server.
+//
+// Call [httpfx.AsController] in non-`enclave` modules so `enclave` can detect, register and serve
+// specified controllers through the provisioned HTTP server.
+//
+// Database client is configured with http.ServerConfig, which is populated using environment variables;
+// Given environment variables are specified in the same config structure by the field tag `env` whereas
+// default values (if any) are specified by the field tag `envDefault`.
 func WithServerHTTP() ApplicationOption {
 	return func(o *appOptions) {
 		if o.fxOptions == nil {
@@ -54,8 +70,16 @@ func WithServerHTTP() ApplicationOption {
 	}
 }
 
-// NewApp allocates a runnable application object ([fx.App])
-func NewApp(opts ...ApplicationOption) *fx.App {
+// New allocates a runnable application object ([fx.App]) with a slice of [fx.Option] objects for
+// basic system functionalities (logging, application-aware metadata, validation, unique-identifier generation).
+//
+// This routine will load environment variables from `.env` file located alongside application binary. If not existent,
+// it will use operating-system (OS) environment variables instead. `enclave` recommends using OS-provisioned
+// variables in cloud environments and `.env` files for local development.
+//
+// Use [ApplicationOption] directives to customize the final application
+// (e.g. [WithServerHTTP]).
+func New(opts ...ApplicationOption) *fx.App {
 	options := appOptions{}
 	for _, opt := range opts {
 		opt(&options)
