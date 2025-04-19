@@ -2,100 +2,114 @@ package enclave
 
 import (
 	"log/slog"
+	"os"
 
-	"github.com/hadroncorp/geck/transport/transportfx/httpfx"
+	"github.com/hadroncorp/geck/applicationfx"
+	"github.com/hadroncorp/geck/observabilityfx/loggingfx"
+	"github.com/hadroncorp/geck/persistence/postgres/postgresfx"
+	"github.com/hadroncorp/geck/persistencefx/identifierfx"
+	"github.com/hadroncorp/geck/persistencefx/sqlfx"
+	"github.com/hadroncorp/geck/transportfx/httpfx"
+	"github.com/hadroncorp/geck/validationfx"
 	"github.com/joho/godotenv"
-
-	"github.com/hadroncorp/geck/application/applicationfx"
-	"github.com/hadroncorp/geck/observability/observabilityfx/loggingfx"
-	"github.com/hadroncorp/geck/persistence/driver/postgres/postgresfx"
-	"github.com/hadroncorp/geck/persistence/persistencefx/identifierfx"
-	"github.com/hadroncorp/geck/persistence/persistencefx/sqlfx"
-	"github.com/hadroncorp/geck/validation/validationfx"
 	"go.uber.org/fx"
+
+	"github.com/hadroncorp/enclave/persistencefx"
 )
 
-type appOptions struct {
-	fxOptions []fx.Option
-}
-
-type ApplicationOption func(o *appOptions)
-
-// WithOptions appends `options` ([fx.Option]) slice into an application base [fx.Option] slice.
-func WithOptions(options ...fx.Option) ApplicationOption {
-	return func(o *appOptions) {
-		if o.fxOptions == nil {
-			o.fxOptions = make([]fx.Option, 0, len(options))
-		}
-		o.fxOptions = append(o.fxOptions, options...)
-	}
-}
-
-// WithPostgres appends [fx.Option] required to use a Postgres database in the application.
+// RunApplication initializes the application with the provided options.
 //
-// Database client is configured with postgres.DBConfig, which is populated using environment variables;
-// Given environment variables are specified in the same config structure by the field tag `env` whereas
-// default values (if any) are specified by the field tag `envDefault`.
-func WithPostgres(enableLogging bool) ApplicationOption {
-	return func(o *appOptions) {
-		opts := []fx.Option{
-			postgresfx.Module,
-			sqlfx.GoquModule,
-			sqlfx.InterceptorModule,
-		}
-		if enableLogging {
-			opts = append(opts, sqlfx.ObservabilityModule)
-		}
-		if o.fxOptions == nil {
-			o.fxOptions = make([]fx.Option, 0, len(opts))
-		}
-		o.fxOptions = append(o.fxOptions, opts...)
-	}
-}
-
-// WithServerHTTP appends [fx.Option] required to spin up an HTTP server.
+// It loads environment variables from a .env file if it exists, uses OS environment variables otherwise.
 //
-// Call [httpfx.AsController] in non-`enclave` modules so `enclave` can detect, register and serve
-// specified controllers through the provisioned HTTP server.
+// This routine is designed to be used as the entry point for the application, setting up the necessary dependencies
+// and configurations required for the application to run properly. It uses the [go.uber.org/fx] framework
+// to manage the lifecycle of the application and its components. No extra steps for initialization are needed
+// after calling this function, as it will automatically start the application and manage its lifecycle.
 //
-// Database client is configured with http.ServerConfig, which is populated using environment variables;
-// Given environment variables are specified in the same config structure by the field tag `env` whereas
-// default values (if any) are specified by the field tag `envDefault`.
-func WithServerHTTP() ApplicationOption {
-	return func(o *appOptions) {
-		if o.fxOptions == nil {
-			o.fxOptions = make([]fx.Option, 0, 1)
-		}
-		o.fxOptions = append(o.fxOptions, httpfx.ServerModule)
-	}
-}
-
-// New allocates a runnable application object ([fx.App]) with a slice of [fx.Option] objects for
-// basic system functionalities (logging, application-aware metadata, validation, unique-identifier generation).
-//
-// This routine will load environment variables from `.env` file located alongside application binary. If not existent,
-// it will use operating-system (OS) environment variables instead. `enclave` recommends using OS-provisioned
-// variables in cloud environments and `.env` files for local development.
-//
-// Use [ApplicationOption] directives to customize the final application
-// (e.g. [WithServerHTTP]).
-func New(opts ...ApplicationOption) *fx.App {
-	options := appOptions{}
-	for _, opt := range opts {
-		opt(&options)
-	}
-
+// In addition, this routine sets up the application with basic modules like application metadata (name, version
+// and environment), logging (with stdlib [slog] package), validations ([github.com/go-playground/validator/v10]),
+// identifier factory (KSUID format) and persistence (e.g. pagination) APIs.
+func RunApplication(opts ...Option) {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	if err := godotenv.Load(); err != nil {
-		slog.Warn("error loading .env file, using environment variables")
+		logger.Warn("failed to load .env file, using OS environment variables", slog.String("error", err.Error()))
 	}
 
-	initOpts := []fx.Option{
-		loggingfx.SlogModule,
-		applicationfx.Module,
-		validationfx.GoPlaygroundModule,
-		identifierfx.KSUIDModule,
+	options := &option{
+		fxOpts: []fx.Option{
+			applicationfx.Module,
+			loggingfx.SlogModule,
+			validationfx.GoPlaygroundModule,
+			identifierfx.KSUIDModule,
+			persistencefx.Module,
+		},
 	}
-	initOpts = append(initOpts, options.fxOptions...)
-	app := fx.New(initOpts...)
-	return app
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if options.disableDepInjectorLogs {
+		options.fxOpts = append(options.fxOpts, fx.NopLogger)
+	}
+
+	fx.New(options.fxOpts...).Run()
+}
+
+// -- Options --
+
+type option struct {
+	disableDepInjectorLogs bool
+	fxOpts                 []fx.Option
+}
+
+// Option is a function that modifies the enclave application options.
+type Option func(*option)
+
+// WithDisabledDepInjectorLogs disables the dependency injector logs.
+func WithDisabledDepInjectorLogs() Option {
+	return func(options *option) {
+		options.disableDepInjectorLogs = true
+	}
+}
+
+// WithFxOptions appends the provided fx options to the enclave application.
+func WithFxOptions(opts ...fx.Option) Option {
+	return func(options *option) {
+		options.fxOpts = append(options.fxOpts, opts...)
+	}
+}
+
+// WithServerHTTP adds the HTTP server module to the enclave application.
+func WithServerHTTP() Option {
+	return WithFxOptions(
+		httpfx.ServerModule,
+	)
+}
+
+// WithSQL adds the SQL module to the enclave application.
+func WithSQL() Option {
+	return WithFxOptions(
+		sqlfx.InterceptorModule,
+	)
+}
+
+// WithTransactionContextSQL adds the SQL transaction context module to the enclave application.
+func WithTransactionContextSQL() Option {
+	return WithFxOptions(
+		sqlfx.TransactionModule,
+	)
+}
+
+// WithObservabilitySQL adds the SQL observability module to the enclave application.
+func WithObservabilitySQL() Option {
+	return WithFxOptions(
+		sqlfx.ObservabilityModule,
+	)
+}
+
+// WithPostgres adds the Postgres module to the enclave application.
+func WithPostgres() Option {
+	return WithFxOptions(
+		postgresfx.Module,
+	)
 }
