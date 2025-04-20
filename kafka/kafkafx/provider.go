@@ -9,7 +9,9 @@ import (
 
 var syncWriterProviders = fx.Provide(
 	configuration.Parse[writeClientConfig],
-	newWriterClient,
+	fx.Annotate(
+		newWriterClient,
+	),
 	fx.Annotate(
 		kafka.NewSyncWriter,
 		fx.As(new(stream.Writer)),
@@ -28,7 +30,9 @@ var readerProviders = fx.Provide(
 
 var txWriterProviders = fx.Provide(
 	configuration.Parse[txWriteClientConfig],
-	newTxWriteClient,
+	fx.Annotate(
+		newTxWriteClient,
+	),
 	fx.Annotate(
 		kafka.NewTransactionalWriter,
 		fx.As(new(stream.Writer)),

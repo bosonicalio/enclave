@@ -89,7 +89,7 @@ func convertCompressionTypes(compressionTypes []string) []kgo.CompressionCodec {
 // -- Consumer --
 
 type ConsumerConfig struct {
-	ResetOffset         string `env:"KAFKA_RESET_OFFSET" envDefault:"earliest" validate:"required,oneof=earliest latest committed"`
+	ResetOffset         string `env:"KAFKA_RESET_OFFSET" envDefault:"committed" validate:"required,oneof=earliest latest committed"`
 	FetchIsolationLevel int8   `env:"KAFKA_FETCH_ISOLATION_LEVEL" envDefault:"0" validate:"min=0,max=1"`
 }
 
@@ -127,7 +127,7 @@ func convertIsolationLevel(isolationLevel int8) kgo.IsolationLevel {
 
 type ConsumerGroupConfig struct {
 	ConsumerGroupID    string        `env:"KAFKA_CONSUMER_GROUP_ID" validate:"omitempty,lte=255"`
-	DisableAutocommit  bool          `env:"KAFKA_DISABLE_AUTOCOMMIT" envDefault:"false"`
+	DisableAutocommit  bool          `env:"KAFKA_DISABLE_AUTOCOMMIT" envDefault:"true"`
 	AutocommitInterval time.Duration `env:"KAFKA_AUTOCOMMIT_INTERVAL" envDefault:"5s" validate:"gte=0"`
 }
 
