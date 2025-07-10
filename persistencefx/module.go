@@ -1,7 +1,7 @@
 package persistencefx
 
 import (
-	"github.com/hadroncorp/geck/persistence/paging"
+	"github.com/tesserical/geck/persistence/paging"
 	"go.uber.org/fx"
 )
 

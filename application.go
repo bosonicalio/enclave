@@ -4,17 +4,17 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/hadroncorp/geck/applicationfx"
-	"github.com/hadroncorp/geck/observabilityfx/loggingfx"
-	"github.com/hadroncorp/geck/persistence/postgres/postgresfx"
-	"github.com/hadroncorp/geck/persistencefx/identifierfx"
-	"github.com/hadroncorp/geck/persistencefx/sqlfx"
-	"github.com/hadroncorp/geck/transportfx/httpfx"
-	"github.com/hadroncorp/geck/validationfx"
 	"github.com/joho/godotenv"
+	"github.com/tesserical/geck/applicationfx"
+	"github.com/tesserical/geck/observabilityfx/loggingfx"
+	"github.com/tesserical/geck/persistence/postgres/postgresfx"
+	"github.com/tesserical/geck/persistencefx/identifierfx"
+	"github.com/tesserical/geck/persistencefx/sqlfx"
+	"github.com/tesserical/geck/transportfx/httpfx"
+	"github.com/tesserical/geck/validationfx"
 	"go.uber.org/fx"
 
-	"github.com/hadroncorp/enclave/persistencefx"
+	"github.com/tesserical/enclave/persistencefx"
 )
 
 // RunApplication initializes the application with the provided options.
