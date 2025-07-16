@@ -27,13 +27,14 @@ var Module = fx.Module("enclave/validation",
 
 type config struct {
 	Driver      string   `env:"VALIDATION_DRIVER" envDefault:"go-playground" validate:"required,oneof=go-playground"`
+	CodecDriver string   `env:"VALIDATION_CODEC_DRIVER" envDefault:"json" validate:"required,oneof=json yaml toml xml"`
 	CustomRules []string `env:"VALIDATION_CUSTOM_RULES" envDefault:"date" validate:"dive,oneof=date"`
 }
 
 // -- Factory --
 
 func newValidator(cfg config) (validation.Validator, error) {
-	driver, err := validation.FormatDriver(cfg.Driver)
+	driver, err := validation.ParseDriver(cfg.Driver)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +49,16 @@ func newValidator(cfg config) (validation.Validator, error) {
 		}
 	}
 
+	codecDriver, err := validation.ParseCodecDriver(cfg.CodecDriver)
+	if err != nil {
+		return nil, fmt.Errorf("enclave.validation: unsupported codec driver %s", cfg.CodecDriver)
+	}
+
 	switch driver {
 	case validation.GoPlaygroundDriver:
 		return validation.NewGoPlaygroundValidator(
 			validation.WithRules(rules...),
-			validation.WithCodecDriver(validation.JSONDriver),
+			validation.WithCodecDriver(codecDriver),
 		), nil
 	default:
 		return nil, fmt.Errorf("enclave.validation: unsupported driver %s", driver)
