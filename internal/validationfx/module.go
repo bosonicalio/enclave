@@ -1,11 +1,10 @@
 package validationfx
 
 import (
-	"fmt"
-
-	"go.uber.org/fx"
+	"errors"
 
 	"github.com/tesserical/geck/validation"
+	"go.uber.org/fx"
 
 	"github.com/tesserical/enclave/internal/osenv"
 )
@@ -23,44 +22,29 @@ var Module = fx.Module("enclave/validation",
 	),
 )
 
-// -- Config --
-
-type config struct {
-	Driver      string   `env:"VALIDATION_DRIVER" envDefault:"go-playground" validate:"required,oneof=go-playground"`
-	CodecDriver string   `env:"VALIDATION_CODEC_DRIVER" envDefault:"json" validate:"required,oneof=json yaml toml xml"`
-	CustomRules []string `env:"VALIDATION_CUSTOM_RULES" envDefault:"date" validate:"dive,oneof=date"`
-}
-
 // -- Factory --
 
 func newValidator(cfg config) (validation.Validator, error) {
-	driver, err := validation.ParseDriver(cfg.Driver)
-	if err != nil {
-		return nil, err
-	}
-
 	rules := make([]validation.Rule, 0, len(cfg.CustomRules))
 	for _, ruleName := range cfg.CustomRules {
 		switch ruleName {
 		case "date":
 			rules = append(rules, validation.NewDateRule())
-		default:
-			return nil, fmt.Errorf("enclave.validation: unsupported custom rule %s", ruleName)
 		}
 	}
 
 	codecDriver, err := validation.ParseCodecDriver(cfg.CodecDriver)
 	if err != nil {
-		return nil, fmt.Errorf("enclave.validation: unsupported codec driver %s", cfg.CodecDriver)
+		return nil, err
 	}
 
-	switch driver {
-	case validation.GoPlaygroundDriver:
+	switch cfg.Driver {
+	case "go-playground":
 		return validation.NewGoPlaygroundValidator(
 			validation.WithRules(rules...),
 			validation.WithCodecDriver(codecDriver),
 		), nil
 	default:
-		return nil, fmt.Errorf("enclave.validation: unsupported driver %s", driver)
+		return nil, errors.New("enclave.validation: unsupported driver")
 	}
 }

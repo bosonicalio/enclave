@@ -2,20 +2,52 @@ package enclave
 
 import (
 	"log/slog"
-	"os"
+	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/tesserical/geck/applicationfx"
-	"github.com/tesserical/geck/observabilityfx/loggingfx"
-	"github.com/tesserical/geck/persistence/postgres/postgresfx"
-	"github.com/tesserical/geck/persistencefx/identifierfx"
-	"github.com/tesserical/geck/persistencefx/sqlfx"
-	"github.com/tesserical/geck/transportfx/httpfx"
-	"github.com/tesserical/geck/validationfx"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxtest"
 
-	"github.com/tesserical/enclave/persistencefx"
+	"github.com/tesserical/enclave/internal/applicationfx"
+	"github.com/tesserical/enclave/internal/globallog"
+	"github.com/tesserical/enclave/internal/observabilityfx/loggingfx"
+	"github.com/tesserical/enclave/internal/persistencefx"
+	"github.com/tesserical/enclave/internal/persistencefx/sqlfx"
+	"github.com/tesserical/enclave/internal/transportfx/httpfx"
+	"github.com/tesserical/enclave/internal/validationfx"
 )
+
+// NewApplication creates a new enclave application with the provided options.
+//
+// It allocates the application with basic modules like application metadata (name, version
+// and environment) and logging (with stdlib [slog] package).
+//
+// The application is built using the [go.uber.org/fx] framework, which provides a powerful
+// dependency injection mechanism and lifecycle management.
+//
+// The application can be customized with additional options, such as disabling dependency
+// injector logs, adding custom fx options, or including specific modules like HTTP server,
+// validation, and persistence.
+//
+// The returned application can be run using the [fx.App.Run] method, which will start the
+// application and manage its lifecycle.
+func NewApplication(opts ...Option) *fx.App {
+	options := &option{
+		fxOpts: []fx.Option{
+			fx.RecoverFromPanics(),
+			applicationfx.Module,
+			loggingfx.ModuleSlog,
+		},
+	}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	if options.disableDepInjectorLogs {
+		options.fxOpts = append(options.fxOpts, fx.NopLogger)
+	}
+	return fx.New(options.fxOpts...)
+}
 
 // RunApplication initializes the application with the provided options.
 //
@@ -27,32 +59,43 @@ import (
 // after calling this function, as it will automatically start the application and manage its lifecycle.
 //
 // In addition, this routine sets up the application with basic modules like application metadata (name, version
-// and environment), logging (with stdlib [slog] package), validations ([github.com/go-playground/validator/v10]),
-// identifier factory (KSUID format) and persistence (e.g. pagination) APIs.
+// and environment) and logging (with stdlib [slog] package).
 func RunApplication(opts ...Option) {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	if err := godotenv.Load(); err != nil {
-		logger.Warn("failed to load .env file, using OS environment variables", slog.String("error", err.Error()))
+		globallog.Logger().
+			Warn("failed to load .env file, using OS environment variables", slog.String("error", err.Error()))
 	}
+	NewApplication(opts...).Run()
+}
 
+// -- Testing --
+
+// NewTestApplication creates a new enclave application with the provided options.
+//
+// It allocates the application with basic modules like application metadata (name, version
+// and environment) and logging (with stdlib [slog] package).
+//
+// The application is built using the [go.uber.org/fx] framework, which provides a powerful
+// dependency injection mechanism and lifecycle management.
+//
+// The application can be customized with additional options, such as disabling dependency
+// injector logs, adding custom fx options, or including specific modules like HTTP server,
+// validation, and persistence.
+//
+// The returned application can be run using the [fx.App.Run] method, which will start the
+// application and manage its lifecycle.
+func NewTestApplication(tb testing.TB, opts ...Option) *fxtest.App {
 	options := &option{
 		fxOpts: []fx.Option{
+			fx.RecoverFromPanics(),
 			applicationfx.Module,
-			loggingfx.SlogModule,
-			validationfx.GoPlaygroundModule,
-			identifierfx.KSUIDModule,
-			persistencefx.Module,
+			loggingfx.ModuleSlog,
 		},
 	}
 	for _, opt := range opts {
 		opt(options)
 	}
-
-	if options.disableDepInjectorLogs {
-		options.fxOpts = append(options.fxOpts, fx.NopLogger)
-	}
-
-	fx.New(options.fxOpts...).Run()
+	return fxtest.New(tb, options.fxOpts...)
 }
 
 // -- Options --
@@ -86,30 +129,30 @@ func WithServerHTTP() Option {
 	)
 }
 
-// WithSQL adds the SQL module to the enclave application.
+// WithValidation adds the validation module to the enclave application.
+//
+// This module provides a validation engine based on [github.com/go-playground/validator/v10].
+func WithValidation() Option {
+	return WithFxOptions(
+		validationfx.Module,
+	)
+}
+
+// WithPersistence adds the persistence module to the enclave application.
+//
+// This module provides a basic pagination API and an identifier factory (KSUID format).
+func WithPersistence() Option {
+	return WithFxOptions(
+		persistencefx.Module,
+	)
+}
+
+// WithSQL adds the SQL database module to the enclave application.
+//
+// Requires an external module to provide the database connection (sql.DB). Available drivers are in different
+// go modules (e.g. enclave/postgres).
 func WithSQL() Option {
 	return WithFxOptions(
-		sqlfx.InterceptorModule,
-	)
-}
-
-// WithTransactionContextSQL adds the SQL transaction context module to the enclave application.
-func WithTransactionContextSQL() Option {
-	return WithFxOptions(
-		sqlfx.TransactionModule,
-	)
-}
-
-// WithObservabilitySQL adds the SQL observability module to the enclave application.
-func WithObservabilitySQL() Option {
-	return WithFxOptions(
-		sqlfx.ObservabilityModule,
-	)
-}
-
-// WithPostgres adds the Postgres module to the enclave application.
-func WithPostgres() Option {
-	return WithFxOptions(
-		postgresfx.Module,
+		sqlfx.Module,
 	)
 }

@@ -5,10 +5,12 @@ import (
 	"runtime"
 
 	"github.com/tesserical/geck/application"
+
+	"github.com/tesserical/enclave/internal/globallog"
 )
 
-func logAppStart(logger *slog.Logger, config application.Application) {
-	logger.Info("starting application",
+func logAppStart(config application.Application) {
+	globallog.Logger().Info("starting application",
 		slog.String("name", config.Name),
 		slog.String("environment", config.Environment.String()),
 		slog.String("version", config.Version.String()),
