@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
 	github.com/aws/aws-sdk-go-v2/config v1.29.17
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.70
-	github.com/tesserical/enclave v0.1.4
+	github.com/tesserical/enclave v0.1.6
 	go.uber.org/fx v1.24.0
 )
 
