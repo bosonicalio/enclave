@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
+	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/tesserical/geck/application"
 	geckhttp "github.com/tesserical/geck/transport/http"
@@ -20,7 +21,7 @@ type startServerDeps struct {
 
 	Lifecycle fx.Lifecycle
 	Echo      *echo.Echo
-	Config    geckhttp.ServerConfig
+	Config    serverConfig
 }
 
 func startServer(deps startServerDeps) {
@@ -30,7 +31,16 @@ func startServer(deps startServerDeps) {
 				globallog.Logger().InfoContext(ctx, "starting http server",
 					slog.String("addr", deps.Config.Address),
 				)
-				err := geckhttp.StartServer(deps.Echo, deps.Config)
+				var err error
+				if deps.Config.EnableTLS {
+					// TODO: use TLS configuration from the config
+					err = deps.Echo.StartTLS(deps.Config.Address, "", "")
+				} else if deps.Config.EnableAutoTLS {
+					deps.Echo.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
+					err = deps.Echo.StartAutoTLS(deps.Config.Address)
+				} else {
+					err = deps.Echo.Start(deps.Config.Address)
+				}
 				if errors.Is(err, http.ErrServerClosed) {
 					return
 				} else if err != nil {

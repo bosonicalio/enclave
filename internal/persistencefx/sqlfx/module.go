@@ -25,23 +25,25 @@ var Module = fx.Module("enclave/persistence/sql",
 			fx.ParamTags("", "", `optional:"true"`), // logger is optional
 		),
 	),
+	fx.Invoke(
+		registerTxFactory,
+	),
 )
 
 // -- Factory --
 
 func newDB(cfg Config, db *sql.DB, logger *slog.Logger) gecksql.DB {
-	if cfg.EnableLogging && cfg.EnableTxContext {
+	if !cfg.EnableLogging && !cfg.EnableTxContext {
 		return db
 	}
+	// NOTE: Order of decorators matters. Last is the first to be applied.
 	var aggregateDB = gecksql.DB(db)
+	if cfg.EnableTxContext {
+		aggregateDB = gecksql.NewDBTxPropagator(aggregateDB)
+	}
 	if cfg.EnableLogging && logger != nil {
 		aggregateDB = gecksql.NewDBLogger(aggregateDB, logger,
 			gecksql.WithLogLevel(cfg.LogLevel),
-		)
-	}
-	if cfg.EnableTxContext {
-		aggregateDB = gecksql.NewDBTxPropagator(aggregateDB,
-			gecksql.WithAutoCreateTx(cfg.EnableTxAutoCreate),
 		)
 	}
 	return aggregateDB
