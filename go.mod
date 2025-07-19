@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/samber/lo v1.51.0
 	github.com/stretchr/testify v1.10.0
-	github.com/tesserical/geck v0.1.15
+	github.com/tesserical/geck v0.1.16
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.40.0
 )

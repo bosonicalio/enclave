@@ -24,6 +24,7 @@ var Module = fx.Module("enclave/persistence/sql",
 			newDB,
 			fx.ParamTags("", "", `optional:"true"`), // logger is optional
 		),
+		newTxFactory,
 	),
 	fx.Invoke(
 		registerTxFactory,
@@ -47,4 +48,11 @@ func newDB(cfg Config, db *sql.DB, logger *slog.Logger) gecksql.DB {
 		)
 	}
 	return aggregateDB
+}
+
+func newTxFactory(db gecksql.DB, cfg Config) gecksql.TxFactory {
+	return gecksql.NewTxFactory(db, &sql.TxOptions{
+		Isolation: cfg.TxContextIsolationLevel,
+		ReadOnly:  cfg.TxContextReadOnly,
+	})
 }

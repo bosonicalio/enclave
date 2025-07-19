@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/samber/lo"
+	"github.com/tesserical/geck/persistence"
 	"github.com/tesserical/geck/persistence/identifier"
 	"github.com/tesserical/geck/persistence/paging"
 	"go.uber.org/fx"
@@ -28,6 +29,7 @@ var Module = fx.Module("enclave/persistence",
 		newTokenCipherKey,
 		osenv.ParseAs[identifierConfig],
 		newIdentifierFactory,
+		persistence.NewTxManager,
 	),
 )
 

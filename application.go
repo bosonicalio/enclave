@@ -140,7 +140,8 @@ func WithValidation() Option {
 
 // WithPersistence adds the persistence module to the enclave application.
 //
-// This module provides a basic pagination API and an identifier factory (KSUID format).
+// This module provides generic components for most persistence-related operations
+// (e.g. pagination API, identifier factory, transaction manager).
 func WithPersistence() Option {
 	return WithFxOptions(
 		persistencefx.Module,
