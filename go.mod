@@ -1,4 +1,4 @@
-module github.com/tesserical/enclave
+module github.com/bosonical/enclave
 
 go 1.23.0
 
