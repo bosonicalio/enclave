@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"github.com/tesserical/enclave"
+	"github.com/bosonicalio/enclave"
 )
 
 // WithPostgres returns an enclave option that includes the Postgres module.

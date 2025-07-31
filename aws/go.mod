@@ -1,4 +1,4 @@
-module github.com/tesserical/enclave/aws
+module github.com/bosonicalio/enclave/aws
 
 go 1.23.0
 
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
 	github.com/aws/aws-sdk-go-v2/config v1.29.17
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.70
-	github.com/tesserical/enclave v0.1.6
+	github.com/bosonicalio/enclave v0.1.10
 	go.uber.org/fx v1.24.0
 )
 
@@ -23,6 +23,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.34.0 // indirect
 	github.com/aws/smithy-go v1.22.4 // indirect
+	github.com/bosonicalio/geck v0.1.19 // indirect
 	github.com/caarlos0/env/v11 v11.3.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -37,7 +38,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
-	github.com/tesserical/geck v0.1.13 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect

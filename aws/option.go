@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/tesserical/enclave"
+	"github.com/bosonicalio/enclave"
 )
 
 // WithAmazonWebServices returns an enclave.Option that includes the AWS module.

@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/samber/lo"
 
-	"github.com/tesserical/enclave/internal/persistencefx/sqlfx"
+	"github.com/bosonicalio/enclave/internal/persistencefx/sqlfx"
 )
 
 func logDBInfo(logger *slog.Logger, config sqlfx.Config) {

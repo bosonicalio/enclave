@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/tesserical/geck/persistence/postgres"
+	"github.com/bosonicalio/geck/persistence/postgres"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/internal/persistencefx/sqlfx"
+	"github.com/bosonicalio/enclave/internal/persistencefx/sqlfx"
 )
 
 var module = fx.Options(

@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/aws/internal/awsconfig"
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/aws/internal/awsconfig"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 var module = fx.Module("enclave/aws",
