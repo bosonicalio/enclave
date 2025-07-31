@@ -1,13 +1,13 @@
 package applicationfx
 
 import (
-	"github.com/tesserical/geck/environment"
-	"github.com/tesserical/geck/version"
+	"github.com/bosonicalio/geck/environment"
+	"github.com/bosonicalio/geck/version"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/geck/application"
+	"github.com/bosonicalio/geck/application"
 
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 // Module is the `uber/fx` module of the [application] package.

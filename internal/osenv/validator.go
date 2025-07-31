@@ -3,7 +3,7 @@ package osenv
 import (
 	"sync"
 
-	"github.com/tesserical/geck/validation"
+	"github.com/bosonicalio/geck/validation"
 )
 
 var (

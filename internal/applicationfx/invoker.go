@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"runtime"
 
-	"github.com/tesserical/geck/application"
+	"github.com/bosonicalio/geck/application"
 
-	"github.com/tesserical/enclave/internal/globallog"
+	"github.com/bosonicalio/enclave/internal/globallog"
 )
 
 func logAppStart(config application.Application) {

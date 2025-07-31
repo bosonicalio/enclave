@@ -10,10 +10,10 @@ import (
 	"go.uber.org/fx"
 	"golang.org/x/crypto/acme/autocert"
 
-	"github.com/tesserical/geck/application"
-	geckhttp "github.com/tesserical/geck/transport/http"
+	"github.com/bosonicalio/geck/application"
+	geckhttp "github.com/bosonicalio/geck/transport/http"
 
-	"github.com/tesserical/enclave/internal/globallog"
+	"github.com/bosonicalio/enclave/internal/globallog"
 )
 
 type startServerDeps struct {

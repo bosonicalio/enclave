@@ -3,14 +3,14 @@ package persistencefx
 import (
 	"errors"
 
+	"github.com/bosonicalio/geck/persistence"
+	"github.com/bosonicalio/geck/persistence/identifier"
+	"github.com/bosonicalio/geck/persistence/paging"
 	"github.com/samber/lo"
-	"github.com/tesserical/geck/persistence"
-	"github.com/tesserical/geck/persistence/identifier"
-	"github.com/tesserical/geck/persistence/paging"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/internal/globallog"
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/globallog"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 // Module is the [fx] module for the persistence API.

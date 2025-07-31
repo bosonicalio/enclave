@@ -3,7 +3,7 @@ package loggingfx
 import (
 	"go.uber.org/fx"
 
-	"github.com/tesserical/geck/observability/logging"
+	"github.com/bosonicalio/geck/observability/logging"
 )
 
 // ModuleSlog is the `uber/fx` module of the [logging] package, using

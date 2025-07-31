@@ -1,8 +1,8 @@
 package sqlfx
 
 import (
-	"github.com/tesserical/geck/persistence"
-	gecksql "github.com/tesserical/geck/persistence/sql"
+	"github.com/bosonicalio/geck/persistence"
+	gecksql "github.com/bosonicalio/geck/persistence/sql"
 )
 
 func registerTxFactory(txManager *persistence.TxManager, factory gecksql.TxFactory) {

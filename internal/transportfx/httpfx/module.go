@@ -4,9 +4,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
 
-	geckhttp "github.com/tesserical/geck/transport/http"
+	geckhttp "github.com/bosonicalio/geck/transport/http"
 
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 // ServerModule is the `uber/fx` module of the [geckhttp] package, aimed for HTTP servers.

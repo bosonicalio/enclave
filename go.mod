@@ -1,16 +1,16 @@
-module github.com/bosonical/enclave
+module github.com/bosonicalio/enclave
 
 go 1.23.0
 
 toolchain go1.24.0
 
 require (
+	github.com/bosonicalio/geck v0.1.19
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/samber/lo v1.51.0
 	github.com/stretchr/testify v1.10.0
-	github.com/tesserical/geck v0.1.16
 	go.uber.org/fx v1.24.0
 	golang.org/x/crypto v0.40.0
 )

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"log/slog"
 
-	gecksql "github.com/tesserical/geck/persistence/sql"
+	gecksql "github.com/bosonicalio/geck/persistence/sql"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 // NOTE: This might need to change in the future to support more complex configurations,

@@ -8,13 +8,13 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxtest"
 
-	"github.com/tesserical/enclave/internal/applicationfx"
-	"github.com/tesserical/enclave/internal/globallog"
-	"github.com/tesserical/enclave/internal/observabilityfx/loggingfx"
-	"github.com/tesserical/enclave/internal/persistencefx"
-	"github.com/tesserical/enclave/internal/persistencefx/sqlfx"
-	"github.com/tesserical/enclave/internal/transportfx/httpfx"
-	"github.com/tesserical/enclave/internal/validationfx"
+	"github.com/bosonicalio/enclave/internal/applicationfx"
+	"github.com/bosonicalio/enclave/internal/globallog"
+	"github.com/bosonicalio/enclave/internal/observabilityfx/loggingfx"
+	"github.com/bosonicalio/enclave/internal/persistencefx"
+	"github.com/bosonicalio/enclave/internal/persistencefx/sqlfx"
+	"github.com/bosonicalio/enclave/internal/transportfx/httpfx"
+	"github.com/bosonicalio/enclave/internal/validationfx"
 )
 
 // NewApplication creates a new enclave application with the provided options.

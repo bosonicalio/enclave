@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 func TestNewValidation(t *testing.T) {

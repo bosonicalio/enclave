@@ -3,10 +3,10 @@ package validationfx
 import (
 	"errors"
 
-	"github.com/tesserical/geck/validation"
+	"github.com/bosonicalio/geck/validation"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/internal/osenv"
+	"github.com/bosonicalio/enclave/internal/osenv"
 )
 
 // Module is the `uber/fx` module of the [validation] package, offering
