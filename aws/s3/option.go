@@ -1,7 +1,7 @@
 package s3
 
 import (
-	"github.com/tesserical/enclave"
+	"github.com/bosonicalio/enclave"
 )
 
 // WithS3 returns an enclave.Option that includes the S3 module.

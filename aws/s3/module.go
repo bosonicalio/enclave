@@ -6,7 +6,7 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 
-	"github.com/tesserical/enclave/aws/internal/awsconfig"
+	"github.com/bosonicalio/enclave/aws/internal/awsconfig"
 )
 
 var module = fx.Module("enclave/aws",
